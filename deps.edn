@@ -14,4 +14,4 @@
                "--repl-env" "node"
                "-i" "test/quoll/michelangelo/core_test.cljc"]  ;; execute with clj -M:test-cljs
   }
-  :neil {:project {:name quoll/michelangelo}}}}
+  :neil {:project {:name quoll/michelangelo}}}
