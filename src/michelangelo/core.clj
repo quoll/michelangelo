@@ -2,7 +2,8 @@
       :author "Paula Gearon"}
   michelangelo.core
   (:require [donatello.ttl :as ttl]
-            [quoll.raphael.core :as raphael])
+            [quoll.raphael.core :as raphael]
+            [michelangelo.data :refer [ordered-map]])
   (:import [java.net URI]))
 
 
@@ -48,8 +49,8 @@
           idx
           (assoc idx a (assoc idxb b (conj idxc c))))
         (assoc idx a (assoc idxb b #{c idxc})))
-      (assoc idx a (assoc idxb b #{c})))
-    (assoc idx a {b #{c}})))
+      (assoc idx a (assoc idxb b c)))
+    (assoc idx a (ordered-map b c))))
 
 (defn add-all
   "Inserts all triples in a sequence into a nested map"
@@ -59,7 +60,7 @@
 (defn simple-graph
   "Creates a nested-map version of a graph from a sequence of triples"
   [triples]
-  (add-all {} triples))
+  (add-all (ordered-map) triples))
 
 (defn parsed-graph
   "Converts a graph parsed by Raphel into a nested map, with metadata for the prefixes and base."

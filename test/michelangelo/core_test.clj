@@ -31,16 +31,16 @@
 (deftest test-parse
   (testing "Parsing graph into Donatello structures"
     (let [tpls (parse tst-graph)]
-      (is (= {:x/_1 {:rdf/type :x/Example
+      (is (= tpls
+             {:x/_1 {:rdf/type :x/Example
                      :rdf/value "ex"}
               (URI. "http://local.com/test/data") {:x/prop b1}
               b1 {:y/p1 1
-                  :y/p2 2}}
-             tpls))
-      (is (= {:base "http://local.com/test/"
+                  :y/p2 2}}))
+      (is (= (meta tpls)
+             {:base "http://local.com/test/"
               :namespaces {"x" "http://x.com#"
-                           "y" "http://y.org#"}}
-             (meta tpls))))))
+                           "y" "http://y.org#"}})))))
 
 (defmacro as-string
   [expr]
@@ -57,6 +57,6 @@
           output2 (as-string (ttl/write-prefixes! (:namespaces m)))
           output3 (as-string (ttl/write-triples-map! p))]
       (is (= output1 "@base <http://local.com/test/> .\n"))
-      (is (= output2 "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n@prefix x: <http://x.com#> .\n@prefix y: <http://y.org#> .\n\n"))
-      (is (= output3 "x:_1 a x:Example;\nrdf:value \"ex\".<http://local.com/test/data> x:prop _:b1.\n_:b1 y:p1 1;     y:p2 2.")))))
+      (is (= output2 "@prefix x: <http://x.com#> .\n@prefix y: <http://y.org#> .\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"))
+      (is (= output3 "x:_1 rdf:type x:Example;\n     rdf:value \"ex\".\n\n_:b0 y:p1 1;\n     y:p2 2.\n\n<http://local.com/test/data> x:prop _:b0.\n\n")))))
 
