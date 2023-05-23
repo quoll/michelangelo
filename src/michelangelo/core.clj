@@ -3,7 +3,7 @@
   michelangelo.core
   (:require [donatello.ttl :as ttl]
             [quoll.raphael.core :as raphael]
-            [michelangelo.data :refer [ordered-map]])
+            [tiara.data :refer [ordered-map]])
   (:import [java.net URI]))
 
 

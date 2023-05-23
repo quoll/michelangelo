@@ -1,7 +1,8 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojars.quoll/raphael {:mvn/version "0.1.2"}
-        io.github.quoll/donatello {:git/tag "v1.2.0" :git/sha "13a2216"}}
+        io.github.quoll/donatello {:git/tag "v1.2.0" :git/sha "13a2216"}
+        io.github.quoll/tiara {:git/tag "v0.0.1" :git/sha "90407e7"}}
  :aliases
  {:test
   {:extra-paths ["test"]
