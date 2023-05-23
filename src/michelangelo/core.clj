@@ -3,7 +3,7 @@
   michelangelo.core
   (:require [donatello.ttl :as ttl]
             [quoll.raphael.core :as raphael]
-            [tiara.data :refer [ordered-map]])
+            [tiara.data :refer [ordered-map EMPTY_MAP]])
   (:import [java.net URI]))
 
 
@@ -29,7 +29,7 @@
   (new-literal [this s] s)
   (new-literal [this s t] (ttl/typed-literal s t))
   (new-lang-string [this s lang] (ttl/lang-literal s lang))
-  (rdf-type [this] :rdf/type)
+  (rdf-type [this] :a)
   (rdf-first [this] :rdf/first)
   (rdf-rest [this] :rdf/rest)
   (rdf-nil [this] :rdf/nil))
@@ -37,7 +37,7 @@
 (defn round-trip-generator
   "Creates a new RoundTripGenerator"
   []
-  (->RoundTripGenerator 0 {} {}))
+  (->RoundTripGenerator 0 {} EMPTY_MAP))
 
 (defn index-add
   "Merges a single triple into a nested map"
@@ -79,4 +79,3 @@
     (ttl/write-base! out base)
     (ttl/write-prefixes! out namespaces)
     (ttl/write-triples-map! out g)))
-
