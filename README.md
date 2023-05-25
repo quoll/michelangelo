@@ -25,7 +25,8 @@ This library uses [Raphael](https://github.com/quoll/raphael) to parse [Turtle](
                                             :ex/predicate2 #{1 2 3}})]
 
     ;; The context should be added back as meta, just as it arrived
-    (m/write-graph (with-meta new-graph new-context))))
+    (with-open [out (io/writer "destination.ttl")]
+      (m/write-graph out (with-meta new-graph new-context)))))
 ```
 
 ## License
