@@ -13,8 +13,9 @@ This library uses [Raphael](https://github.com/quoll/raphael) to parse [Turtle](
 
 ```clojure
 (require '[michelangelo.core :as m])
+(require '[clojure.java.io :as io])
 
-(let [graph (m/parse (slurp "source.ttl"))
+(let [graph (m/parse (slurp "resources/sample.ttl"))
       context (meta graph)]
 
   ;; context is a map of :namespaces and :base
@@ -25,7 +26,8 @@ This library uses [Raphael](https://github.com/quoll/raphael) to parse [Turtle](
                                             :ex/predicate2 #{1 2 3}})]
 
     ;; The context should be added back as meta, just as it arrived
-    (m/write-graph (with-meta new-graph new-context))))
+    (with-open [out (io/writer "resources/destination.ttl")]
+      (m/write-graph out (with-meta new-graph new-context)))))
 ```
 
 ## License
