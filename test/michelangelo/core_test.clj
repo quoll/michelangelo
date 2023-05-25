@@ -57,6 +57,6 @@
           output2 (as-string (ttl/write-prefixes! (:namespaces m)))
           output3 (as-string (ttl/write-triples-map! p))]
       (is (= output1 "@base <http://local.com/test/> .\n"))
-      (is (= output2 "@prefix x: <http://x.com#> .\n@prefix y: <http://y.org#> .\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"))
+      (is (= output2 "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n@prefix x: <http://x.com#> .\n@prefix y: <http://y.org#> .\n\n"))
       (is (= output3 "x:_1 a x:Example;\n     rdf:value \"ex\".\n\n_:b0 y:p1 1;\n     y:p2 2.\n\n<http://local.com/test/data> x:prop _:b0.\n\n")))))
 

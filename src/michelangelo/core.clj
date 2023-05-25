@@ -3,7 +3,7 @@
   michelangelo.core
   (:require [donatello.ttl :as ttl]
             [quoll.raphael.core :as raphael]
-            [tiara.data :refer [ordered-map EMPTY_MAP]])
+            [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]])
   (:import [java.net URI]))
 
 
@@ -48,7 +48,7 @@
         (if (get idxc c)
           idx
           (assoc idx a (assoc idxb b (conj idxc c))))
-        (assoc idx a (assoc idxb b #{c idxc})))
+        (assoc idx a (assoc idxb b (ordered-set idxc c))))
       (assoc idx a (assoc idxb b c)))
     (assoc idx a (ordered-map b c))))
 
