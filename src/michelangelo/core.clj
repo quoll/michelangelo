@@ -79,3 +79,4 @@
     (ttl/write-base! out base)
     (ttl/write-prefixes! out namespaces)
     (ttl/write-triples-map! out g)))
+
