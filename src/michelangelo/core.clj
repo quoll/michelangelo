@@ -3,9 +3,14 @@
   michelangelo.core
   (:require [donatello.ttl :as ttl]
             [quoll.raphael.core :as raphael]
-            [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]])
+            [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]]
+            [clojure.java.io :as io])
   (:import [java.net URI]))
 
+(def ^:dynamic *no-defaults*
+  "A flag to indicate that nil bases or namespaces should result in no base or namespace to be written.
+  The default is to maintain the existing base and namespace if none are specified."
+  false)
 
 (defrecord RoundTripGenerator [counter bnode-cache namespaces]
   raphael/NodeGenerator
@@ -73,10 +78,45 @@
   (parsed-graph (raphael/parse s (round-trip-generator))))
 
 (defn write-graph
-  "Writes a parsed graph to a stream as Turtle"
-  [out g]
-  (let [{:keys [namespaces base]} (meta g)]
-    (ttl/write-base! out base)
-    (ttl/write-prefixes! out namespaces)
-    (ttl/write-triples-map! out g)))
+  "Writes a parsed graph to a stream as Turtle.
+   out - An OutputStream to write to.
+   g - The graph to write.
+   Tha base and namespace prefixes for the graph may included as:
+     - metadata (as a map with keys of `:namespaces` and `:base`).
+     - a map (as per the metadata map).
+     - as individual arguments."
+  ([out g]
+   (let [{:keys [namespaces base]} (meta g)]
+     (write-graph out g namespaces base)))
+  ([out g {:keys [namespaces base]}] (write-graph out g namespaces base))
+  ([out g namespaces base]
+   (when base (ttl/write-base! out base))
+   (when namespaces (ttl/write-prefixes! out namespaces))
+   (binding [ttl/*context-base* base]
+     (ttl/write-triples-map! out g))))
+
+(defn transform-file
+  "Transforms a TTL file.
+  Accepts an input filename, a transforming function, and an output filename.
+  The transforming function receives:
+  - graph: the graph to transform.
+  - namespaces: The prefix namespaces of of the graph.
+  - base: The base of the graph.
+  The result may be one of:
+  - a vector of: [new-graph namespaces base]
+  - a graph with a meta map of `:namespaces` and `:base`
+  Both the base and namespaces are optional to return. If they are not returned, then the
+  previous base and namespaces will be used, unless *no-default* has been set."
+  [infile tx-fn outfile]
+  (let [graph (parse (slurp infile))
+        {:keys [namespaces base] :as context} (meta graph)
+        tx-result (tx-fn graph namespaces base)
+        [new-graph ret-namespaces ret-base] (if (vector? tx-result)
+                                              tx-result
+                                              (let [{:keys [namespaces base]} (meta tx-result)]
+                                                [tx-result namespaces base]))
+        new-namespaces (if *no-defaults* ret-namespaces (or ret-namespaces namespaces))
+        new-base (if *no-defaults* ret-base (or ret-base base))]
+    (with-open [out (io/writer outfile)]
+      (write-graph out new-graph new-namespaces new-base))))
 
