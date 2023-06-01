@@ -1,5 +1,5 @@
 # michelangelo
-TTL transforming library.
+[Turtle](https://www.w3.org/TR/turtle/) transforming library.
 
 ## deps.edn
 Add the following to the `:deps` map in `deps.edn`:
