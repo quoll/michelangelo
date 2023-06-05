@@ -2,7 +2,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojars.quoll/raphael {:mvn/version "0.1.6"}
         org.clojars.quoll/tiara {:mvn/version "0.2.1"}
-        io.github.quoll/donatello {:git/tag "v1.2.4" :git/sha "ea787bd"}}
+        io.github.quoll/donatello {:git/tag "v1.2.5" :git/sha "8b71687"}}
  :aliases
  {:test
   {:extra-paths ["test"]

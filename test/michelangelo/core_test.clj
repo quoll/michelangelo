@@ -90,6 +90,16 @@
                      (is (= base b)))
                    (with-meta g {:namespaces (assoc n :another "http://more.com/another/") :base b}))
                  test-output3 3))
+    (testing "adding a prefix twice"
+      (file-test (fn [g n b]
+                   (let [{:keys [namespaces base]} (meta g)]
+                     (is (= namespaces n))
+                     (is (= base b)))
+                   (with-meta g {:namespaces (-> n
+                                                 (assoc "another" "http://more.com/another/")
+                                                 (assoc :another "http://more.com/another/extra"))
+                                 :base b}))
+                 test-output3 3))
     (testing "adding a prefix with prefixes as a returned value"
       (file-test (fn [g n b]
                    [g (assoc n :another "http://more.com/another/")])
