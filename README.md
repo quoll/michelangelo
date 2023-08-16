@@ -5,7 +5,7 @@
 Add the following to the `:deps` map in `deps.edn`:
 
 ```clojure
-io.github.quoll/michelangelo {:git/tag "v0.1.4" :git/sha "519d376"}
+io.github.quoll/michelangelo {:git/tag "v0.1.5" :git/sha ""}
 ```
 
 ## Usage
