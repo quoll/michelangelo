@@ -4,6 +4,7 @@
   (:require [donatello.ttl :as ttl]
             [quoll.raphael.core :as raphael]
             [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]]
+            [quoll.rdf :as rdf]
             [clojure.java.io :as io])
   (:import [java.net URI]))
 
@@ -12,14 +13,16 @@
   The default is to maintain the existing base and namespace if none are specified."
   false)
 
+(defn uri [s] (URI. s))
+
 (defrecord RoundTripGenerator [counter bnode-cache namespaces]
   raphael/NodeGenerator
   (new-node [this]
-    [(update this :counter inc) (ttl/->BlankNode counter)])
+    [(update this :counter inc) (rdf/unsafe-blank-node (str "_:b" counter))])
   (new-node [this label]
     (if-let [node (get bnode-cache label)]
       [this node]
-      (let [node (ttl/->BlankNode counter)]
+      (let [node (rdf/unsafe-blank-node (str "_:b" counter))]
         [(-> this
              (update :counter inc)
              (update :bnode-cache assoc label node))
@@ -30,10 +33,10 @@
   (get-namespaces [this] (dissoc namespaces :base))
   (get-base [this] (:base namespaces))
   (new-qname [this prefix local] (keyword prefix local))
-  (new-iri [this iri] (URI. iri))
+  (new-iri [this iri] (uri iri))
   (new-literal [this s] s)
-  (new-literal [this s t] (ttl/typed-literal s t))
-  (new-lang-string [this s lang] (ttl/lang-literal s lang))
+  (new-literal [this s t] (rdf/typed-literal s t))
+  (new-lang-string [this s lang] (rdf/lang-literal s lang))
   (rdf-type [this] :a)
   (rdf-first [this] :rdf/first)
   (rdf-rest [this] :rdf/rest)
@@ -120,3 +123,27 @@
     (with-open [out (io/writer outfile)]
       (write-graph out new-graph new-namespaces new-base))))
 
+
+(defn transform-string
+  "Transforms a string containing TTL.
+  Accepts an input string, and a transforming function. Returns a string containing the transformed TTL.
+  The transforming function receives:
+  - graph: the graph to transform.
+  - namespaces: The prefix namespaces of of the graph.
+  - base: The base of the graph.
+  The result may be one of:
+  - a vector of: [new-graph namespaces base]
+  - a graph with a meta map of `:namespaces` and `:base`
+  Both the base and namespaces are optional to return. If they are not returned, then the
+  previous base and namespaces will be used, unless *no-default* has been set."
+  [in tx-fn]
+  (let [graph (parse in)
+        {:keys [namespaces base] :as context} (meta graph)
+        tx-result (tx-fn graph namespaces base)
+        [new-graph ret-namespaces ret-base] (if (vector? tx-result)
+                                              tx-result
+                                              (let [{:keys [namespaces base]} (meta tx-result)]
+                                                [tx-result namespaces base]))
+        new-namespaces (if *no-defaults* ret-namespaces (or ret-namespaces namespaces))
+        new-base (if *no-defaults* ret-base (or ret-base base))]
+    (ttl/to-string write-graph new-graph new-namespaces new-base)))
