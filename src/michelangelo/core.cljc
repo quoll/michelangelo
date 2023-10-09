@@ -5,15 +5,16 @@
             [quoll.raphael.core :as raphael]
             [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]]
             [quoll.rdf :as rdf]
-            [clojure.java.io :as io])
-  (:import [java.net URI]))
+            #?(:clj [clojure.java.io :as io]))
+  #?(:clj (:import [java.net URI])
+     :cljs (:import [goog Uri])))
 
 (def ^:dynamic *no-defaults*
   "A flag to indicate that nil bases or namespaces should result in no base or namespace to be written.
   The default is to maintain the existing base and namespace if none are specified."
   false)
 
-(defn uri [s] (URI. s))
+(defn uri [s] #?(:clj (URI. s) :cljs (Uri. s)))
 
 (defrecord RoundTripGenerator [counter bnode-cache namespaces]
   raphael/NodeGenerator
@@ -98,30 +99,31 @@
    (binding [ttl/*context-base* base]
      (ttl/write-triples-map! out g))))
 
-(defn transform-file
-  "Transforms a TTL file.
-  Accepts an input filename, a transforming function, and an output filename.
-  The transforming function receives:
-  - graph: the graph to transform.
-  - namespaces: The prefix namespaces of of the graph.
-  - base: The base of the graph.
-  The result may be one of:
-  - a vector of: [new-graph namespaces base]
-  - a graph with a meta map of `:namespaces` and `:base`
-  Both the base and namespaces are optional to return. If they are not returned, then the
-  previous base and namespaces will be used, unless *no-default* has been set."
-  [infile tx-fn outfile]
-  (let [graph (parse (slurp infile))
-        {:keys [namespaces base] :as context} (meta graph)
-        tx-result (tx-fn graph namespaces base)
-        [new-graph ret-namespaces ret-base] (if (vector? tx-result)
-                                              tx-result
-                                              (let [{:keys [namespaces base]} (meta tx-result)]
-                                                [tx-result namespaces base]))
-        new-namespaces (if *no-defaults* ret-namespaces (or ret-namespaces namespaces))
-        new-base (if *no-defaults* ret-base (or ret-base base))]
-    (with-open [out (io/writer outfile)]
-      (write-graph out new-graph new-namespaces new-base))))
+#?(:clj
+   (defn transform-file
+     "Transforms a TTL file.
+     Accepts an input filename, a transforming function, and an output filename.
+     The transforming function receives:
+     - graph: the graph to transform.
+     - namespaces: The prefix namespaces of of the graph.
+     - base: The base of the graph.
+     The result may be one of:
+     - a vector of: [new-graph namespaces base]
+     - a graph with a meta map of `:namespaces` and `:base`
+     Both the base and namespaces are optional to return. If they are not returned, then the
+     previous base and namespaces will be used, unless *no-default* has been set."
+     [infile tx-fn outfile]
+     (let [graph (parse (slurp infile))
+           {:keys [namespaces base] :as context} (meta graph)
+           tx-result (tx-fn graph namespaces base)
+           [new-graph ret-namespaces ret-base] (if (vector? tx-result)
+                                                 tx-result
+                                                 (let [{:keys [namespaces base]} (meta tx-result)]
+                                                   [tx-result namespaces base]))
+           new-namespaces (if *no-defaults* ret-namespaces (or ret-namespaces namespaces))
+           new-base (if *no-defaults* ret-base (or ret-base base))]
+       (with-open [out (io/writer outfile)]
+         (write-graph out new-graph new-namespaces new-base)))))
 
 
 (defn transform-string

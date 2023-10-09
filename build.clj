@@ -4,8 +4,8 @@
             [org.corfield.build :as bb]))
 
 (def pom "build-rsc/pom.xml")
-(def lib 'org.clojars.quoll/michaelangelo)
-(def version "0.1.7")
+(def lib 'org.clojars.quoll/michelangelo)
+(def version "0.1.8")
 
 ;; clojure -T:build test
 (defn test "Run the tests." [opts]
