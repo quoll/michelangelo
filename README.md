@@ -1,5 +1,5 @@
 # michelangelo
-[Turtle](https://www.w3.org/TR/turtle/) transforming library.
+[Turtle](https://www.w3.org/TR/turtle/) transforming library for Clojure and ClojureScript.
 
 ## deps.edn
 Add the following to the `:deps` map in `deps.edn`:
@@ -151,11 +151,11 @@ The keys of the graph are the subjects, with each subject being assoc'ed with a 
 ```
 
 ### Clojure RDF Objects
-Literals are usually returned as their natural data type (strings, longs, double), except literals with language tags, or typed literals. These will be returned using `Donatello` types:
-- `donatello.ttl.LangLiteral` for language tagged strings. These have fields of `:text` and `:lang`.
-- `donatello.ttl.TypedLiteral` for typed literals. These have fields of `:text` and `:type`, where the `:type` will be a `URL` or keyword representing a QName.
+Literals are usually returned as their natural data type (strings, longs, double), except literals with language tags, or typed literals. These will be returned using `RuDolF` types:
+- `quoll.rdf.LangLiteral` for language tagged strings. These have fields of `:text` and `:lang`.
+- `quoll.rdf.TypedLiteral` for typed literals. These have fields of `:text` and `:type`, where the `:type` will be a `URL` or keyword representing a QName.
 Another type of object that may be returned by the parser is:
-- `donatello.ttl.BlankNode` for blank nodes. These have an `:id` field to distinguish them.
+- `quoll.rdf.BlankNode` for blank nodes. These have an `:id` field to distinguish them.
 
 ## License
 
