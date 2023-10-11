@@ -5,16 +5,17 @@
             [quoll.raphael.core :as raphael]
             [tiara.data :refer [ordered-map EMPTY_MAP ordered-set]]
             [quoll.rdf :as rdf]
-            #?(:clj [clojure.java.io :as io]))
-  #?(:clj (:import [java.net URI])
-     :cljs (:import [goog Uri])))
+            #?(:clj [clojure.java.io :as io]
+               :cljs [michelangelo.uri :as mu]))
+  #?(:clj (:import [java.net URI])))
 
 (def ^:dynamic *no-defaults*
   "A flag to indicate that nil bases or namespaces should result in no base or namespace to be written.
   The default is to maintain the existing base and namespace if none are specified."
   false)
 
-(defn uri [s] #?(:clj (URI. s) :cljs (Uri. s)))
+#?(:clj (defn uri [s] (URI. s))
+   :cljs (def uri mu/uri))
 
 (defrecord RoundTripGenerator [counter bnode-cache namespaces]
   raphael/NodeGenerator

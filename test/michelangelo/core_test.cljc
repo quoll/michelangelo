@@ -1,15 +1,20 @@
 (ns michelangelo.core-test
   (:require [clojure.test :refer [testing is deftest]]
-            [clojure.java.io :as io]
+            #?(:clj [clojure.java.io :as io])
             [quoll.raphael.core :as raphael]
             [donatello.ttl :as ttl]
             [quoll.rdf :as rdf]
-            [michelangelo.core :refer :all])
-  (:import [java.net URI URL]
-           [java.io StringWriter]))
+            [michelangelo.core :refer [uri simple-graph parse transform-string #?(:clj transform-file)]]
+            [michelangelo.test-data :as tdata]))
 
 (def u1 (uri "http://a.c/subj"))
 (def t1 [[:a1 :p1 1] [:a1 :p1 2] [:a1 :p2 "fred"] [u1 :p1 11] [:x/y :p3 "x"]])
+
+#?(:cljs
+   (extend-protocol IEquiv
+     goog.Uri
+     (-equiv [a b]
+       (and (= goog.Uri (type b)) (= (str a) (str b))))))
 
 (deftest test-graph
   (testing "Creation of a simple graph"
@@ -43,7 +48,6 @@
              {:base "http://local.com/test/"
               :namespaces {"x" "http://x.com#"
                            "y" "http://y.org#"}})))))
-
 (deftest test-write-parse
   (testing "Checking if Donatello can write parsed data"
     (let [p (parse tst-graph)
@@ -99,23 +103,27 @@
                    (assoc-in g [(uri "http://example.org/#green-goblin") :foaf/givenname] "Otto"))
                  test-output6 6))))
 
-(defn file-test
-  [tx-fn output id]
-  (let [fname (str "test" id ".ttl")]
-    (try
-      (transform-file "resources/sample.ttl" tx-fn fname)
-      (is (= output (slurp fname)))
-      (finally 
-        (.delete (io/file fname))))))
+#?(:clj
+   (defn file-test
+     [tx-fn output id]
+     (let [fname (str "test" id ".ttl")]
+       (try
+         (transform-file "resources/sample.ttl" tx-fn fname)
+         (is (= output (slurp fname)))
+         (finally 
+           (.delete (io/file fname)))))))
 
-(deftest test-transform-file
-  (testing "checking if file transform works"
-    (full-transform-test file-test)))
+#?(:clj
+   (deftest test-transform-file
+     (testing "checking if file transform works"
+       (full-transform-test file-test))))
 
 (defn string-test
   [tx-fn output id]
-  (is (= output (transform-string (slurp "resources/sample.ttl") tx-fn))))
+  (is (= output (transform-string tdata/data tx-fn))))
 
 (deftest test-transform-string
   (testing "checking if string transform works"
     (full-transform-test string-test)))
+
+#?(:cljs (cljs.test/run-tests))
