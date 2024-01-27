@@ -7,6 +7,10 @@
 (def lib 'org.clojars.quoll/michelangelo)
 (def version "0.1.8")
 
+;; clojure -T:build clean
+(defn clean "Clean the generated artifacts" [opts]
+  (bb/clean opts))
+
 ;; clojure -T:build test
 (defn test "Run the tests." [opts]
   (bb/run-tests opts))
