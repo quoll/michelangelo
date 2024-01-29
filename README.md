@@ -5,7 +5,7 @@
 Add the following to the `:deps` map in `deps.edn`:
 
 ```clojure
-org.clojars.quoll/michelangelo {:mvn/version "0.1.9"}
+org.clojars.quoll/michelangelo {:mvn/version "0.1.10"}
 ```
 
 ## Usage
